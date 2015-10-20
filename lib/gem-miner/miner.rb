@@ -54,14 +54,15 @@ module GemMiner
     # values.
     def parse_gemfiles
       log 'Parsing gemfiles'
-      search("filename:Gemfile #{@github_search_query}").reduce({}) do |memo, result|
+      gemfiles = search("filename:Gemfile #{@github_search_query}").reduce({}) do |memo, result|
         # We might have more than one Gemfile in a repository...
         memo[name_of(result)] ||= []
         memo[name_of(result)] += extract_gemfile(raw_content(result))
         log '.'
         memo
       end
-      log 'done!\n'
+      log "done!\n"
+      gemfiles
     end
 
     GEM_REGEX = /gem[\s]+([^\n\;]+)/
@@ -71,14 +72,15 @@ module GemMiner
 
     def parse_gemspecs
       log 'Parsing gemspecs'
-      search("filename:gemspec #{@github_search_query}").reduce({}) do |memo, result|
+      gemspecs = search("filename:gemspec #{@github_search_query}").reduce({}) do |memo, result|
         # We might have more than one Gemfile in a repository...
         memo[name_of(result)] ||= []
         memo[name_of(result)] += extract_gemspec(raw_content(result))
         log '.'
         memo
       end
-      log 'done!\n'
+      log "done!\n"
+      gemspecs
     end
 
     GEMSPEC_REGEX = /dependency[\s]+([^\n\;]+)/
@@ -86,8 +88,22 @@ module GemMiner
       gemspec.gsub(/\"/, '\'').scan(GEMSPEC_REGEX).flatten
     end
 
+    def raw_content(result)
+
+    end
+
     def search(query)
-      Octokit.client.search_code(query)['items']
+      @github_client.search_code(query)['items']
+    end
+
+    def name_of(result)
+      result[:repository][:full_name]
+    end
+
+    # Gets the content of a file found in a Github search result.
+    def raw_content(result)
+      content_request = Octokit.contents(name_of(result), path: result[:path])
+      Base64.decode64 content_request[:content]
     end
 
     # Merge two hashes of lists
