@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require 'gem-miner'
+require 'gem-miner/cli'
 
-GemMiner::Miner.gems_for('user:reevoo')
+GemMiner::CLI.start(ARGV)

@@ -18,7 +18,11 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
+  # GitHub API Client
   spec.add_dependency 'octokit', '~> 4'
+
+  # CLI helper. Not at v1 yet...
+  spec.add_dependency 'thor'
 
   spec.add_development_dependency 'bundler', '~> 1'
   spec.add_development_dependency 'rake', '~> 10'
