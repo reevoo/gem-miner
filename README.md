@@ -16,7 +16,7 @@ gem install 'gem-miner'
 
 ## Usage
 
-TODO: Write usage instructions here
+Execute `gem-miner help` in your favourite shell for information on the wonderful things this application can do.
 
 ## Development
 
