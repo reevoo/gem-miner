@@ -53,8 +53,9 @@ module GemMiner
     # Returns a dictionary with the gem as the key and an array of repositories as
     # values.
     def parse_gemfiles
-      log 'Parsing gemfiles'
-      gemfiles = search("filename:Gemfile #{@github_search_query}").reduce({}) do |memo, result|
+      results = search("filename:Gemfile #{@github_search_query}")
+      log "Parsing #{results.count} gemfiles"
+      gemfiles = results.reduce({}) do |memo, result|
         # We might have more than one Gemfile in a repository...
         memo[name_of(result)] ||= []
         memo[name_of(result)] += extract_gemfile(raw_content(result))
@@ -71,8 +72,9 @@ module GemMiner
     end
 
     def parse_gemspecs
-      log 'Parsing gemspecs'
-      gemspecs = search("filename:gemspec #{@github_search_query}").reduce({}) do |memo, result|
+      results = search("filename:gemspec #{@github_search_query}")
+      log "Parsing #{results.count} gemspecs"
+      gemspecs = results.reduce({}) do |memo, result|
         # We might have more than one Gemfile in a repository...
         memo[name_of(result)] ||= []
         memo[name_of(result)] += extract_gemspec(raw_content(result))
@@ -88,10 +90,6 @@ module GemMiner
       gemspec.gsub(/\"/, '\'').scan(GEMSPEC_REGEX).flatten
     end
 
-    def raw_content(result)
-
-    end
-
     def search(query)
       @github_client.search_code(query)['items']
     end
@@ -102,7 +100,7 @@ module GemMiner
 
     # Gets the content of a file found in a Github search result.
     def raw_content(result)
-      content_request = Octokit.contents(name_of(result), path: result[:path])
+      content_request = @github_client.contents(name_of(result), path: result[:path])
       Base64.decode64 content_request[:content]
     end
 
@@ -115,6 +113,18 @@ module GemMiner
     # From http://stackoverflow.com/questions/11171834/merging-ruby-hash-with-array-of-values-into-another-hash-with-array-of-values
     def merge_hashes(hash1, hash2)
       hash1.merge(hash2) { |key, oldval, newval| (oldval | newval) }
+    end
+
+    # Converts a hash of the form A => [Bs] to B => [As]
+    def invert_hash_of_arrays(hash)
+      hash.reduce({}) do |memo, (key, values)|
+        values.each do |v|
+          memo[v] ||= []
+          memo[v] << key
+        end
+
+        memo
+      end
     end
 
     def log(s)
