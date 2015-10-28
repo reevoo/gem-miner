@@ -1,18 +1,21 @@
 require 'gem-miner/miner'
 
 describe GemMiner::Miner do
+
+  let(:client) { double(:client) }
+
   describe '#gems' do
 
     it 'requests gemfiles and gemspecs from Github for the provided query' do
-      subject = described_class.new('QUERY', nil, nil) # disable logging
+      subject = described_class.new('QUERY', client, nil) # disable logging
 
-      expect(subject.github_client).to receive(:search_code)
+      expect(client).to receive(:files)
         .with('filename:Gemfile QUERY')
-        .and_return({ 'items' => [] })
+        .and_return([])
 
-      expect(subject.github_client).to receive(:search_code)
+      expect(client).to receive(:files)
         .with('filename:gemspec QUERY')
-        .and_return({ 'items' => [] })
+        .and_return([])
 
       subject.gems
     end
@@ -26,18 +29,18 @@ describe GemMiner::Miner do
   describe 'logging' do
 
     it 'prints to STDOUT by default' do
-      subject = described_class.new('QUERY')
-      allow(subject.github_client).to receive(:search_code)
-        .and_return({ 'items' => [] })
+      subject = described_class.new('QUERY', client)
+      allow(client).to receive(:files)
+        .and_return([])
 
       expect(STDOUT).to receive(:print).at_least(:once)
       subject.gems
     end
 
     it 'can be turned off' do
-      subject = described_class.new('QUERY', nil, nil)
-      allow(subject.github_client).to receive(:search_code)
-        .and_return({ 'items' => [] })
+      subject = described_class.new('QUERY', client, nil)
+      allow(client).to receive(:files)
+        .and_return([])
 
       expect(STDOUT).not_to receive(:print)
       subject.gems

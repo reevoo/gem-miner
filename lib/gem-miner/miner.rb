@@ -1,22 +1,18 @@
 require 'base64'
 require 'octokit'
 
+require 'gem-miner/github_client'
+
 module GemMiner
   class Miner
-
-    # TODO: This is leaky.
-    attr_reader :github_client
 
     def self.gems_for(*args)
       new(*args).gems
     end
 
-    def initialize(github_search_query, github_access_token = nil, logger = STDOUT)
+    def initialize(github_search_query, github_client = GithubClient.new, logger = STDOUT)
       @github_search_query = github_search_query
-      @github_client = Octokit::Client.new(
-        auto_paginate: true,
-        access_token: github_access_token
-      )
+      @github_client = github_client
       @logger = logger
     end
 
@@ -61,7 +57,7 @@ module GemMiner
       gemfiles = results.reduce({}) do |memo, result|
         # We might have more than one Gemfile in a repository...
         memo[name_of(result)] ||= []
-        memo[name_of(result)] += extract_gemfile(raw_content(result))
+        memo[name_of(result)] += extract_gemfile(result[:content])
         log '.'
         memo
       end
@@ -80,7 +76,7 @@ module GemMiner
       gemspecs = results.reduce({}) do |memo, result|
         # We might have more than one Gemfile in a repository...
         memo[name_of(result)] ||= []
-        memo[name_of(result)] += extract_gemspec(raw_content(result))
+        memo[name_of(result)] += extract_gemspec(result[:content])
         log '.'
         memo
       end
@@ -94,17 +90,7 @@ module GemMiner
     end
 
     def search(query)
-      @github_client.search_code(query)['items']
-    end
-
-    def name_of(result)
-      result[:repository][:full_name]
-    end
-
-    # Gets the content of a file found in a Github search result.
-    def raw_content(result)
-      content_request = @github_client.contents(name_of(result), path: result[:path])
-      Base64.decode64 content_request[:content]
+      @github_client.files(query)
     end
 
     # Merge two hashes of lists
