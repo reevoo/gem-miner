@@ -4,17 +4,20 @@ require 'octokit'
 module GemMiner
   class Miner
 
+    # TODO: This is leaky.
+    attr_reader :github_client
+
     def self.gems_for(*args)
       new(*args).gems
     end
 
-    def initialize(github_search_query, github_access_token = nil, log = true)
+    def initialize(github_search_query, github_access_token = nil, logger = STDOUT)
       @github_search_query = github_search_query
       @github_client = Octokit::Client.new(
         auto_paginate: true,
         access_token: github_access_token
       )
-      @log = log
+      @logger = logger
     end
 
     # A hash of gems and the repositories they are used in:
@@ -128,7 +131,7 @@ module GemMiner
     end
 
     def log(s)
-      print s if @log
+      @logger.print s if @logger
     end
   end
 end
