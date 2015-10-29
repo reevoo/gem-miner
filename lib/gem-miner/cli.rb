@@ -10,6 +10,11 @@ module GemMiner
       desc: 'The Github access token to use when querying Github.',
       type: :string
 
+    option :output,
+      aliases: [:o],
+      desc: 'The filename to output results to (leave blank for console).',
+      type: :string
+
     desc 'gems QUERY', 'Collects all gems for projects given by the Github query.'
     long_desc <<-LD
       Collects all gems for projects given by the Github query.
@@ -27,7 +32,21 @@ module GemMiner
       and the repositories that use the gem as an array of values.
     LD
     def gems(github_search_query)
-      puts GemMiner::Miner.gems_for(github_search_query, options[:token]).to_yaml
+      output GemMiner::Miner.gems_for(github_search_query, options[:token]).to_yaml
+    end
+
+    private
+
+    # Output the result of a command to either the terminal or a file,
+    # depending on the options given.
+    def output(result)
+      if options[:output]
+        File.write(options[:output], result)
+      else
+        puts result
+      end
+
+      result
     end
 
   end
