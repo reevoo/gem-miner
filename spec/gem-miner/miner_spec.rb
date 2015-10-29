@@ -7,7 +7,7 @@ describe GemMiner::Miner do
   describe '#gems' do
 
     it 'requests gemfiles and gemspecs from Github for the provided query' do
-      subject = described_class.new('QUERY', client, nil) # disable logging
+      subject = described_class.new('QUERY', client)
 
       expect(client).to receive(:files)
         .with('filename:Gemfile QUERY')
@@ -28,6 +28,10 @@ describe GemMiner::Miner do
 
   describe 'logging' do
 
+    before do
+      GemMiner::Logger.logger = STDOUT
+    end
+
     it 'prints to STDOUT by default' do
       subject = described_class.new('QUERY', client)
       allow(client).to receive(:files)
@@ -38,7 +42,9 @@ describe GemMiner::Miner do
     end
 
     it 'can be turned off' do
-      subject = described_class.new('QUERY', client, nil)
+      GemMiner::Logger.logger = nil
+
+      subject = described_class.new('QUERY', client)
       allow(client).to receive(:files)
         .and_return([])
 

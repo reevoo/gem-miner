@@ -2,18 +2,19 @@ require 'base64'
 require 'octokit'
 
 require 'gem-miner/github_client'
+require 'gem-miner/logger'
 
 module GemMiner
   class Miner
+    include Logger
 
     def self.gems_for(*args)
       new(*args).gems
     end
 
-    def initialize(github_search_query, github_client = GithubClient.new, logger = STDOUT)
+    def initialize(github_search_query, github_client = GithubClient.new)
       @github_search_query = github_search_query
       @github_client = github_client
-      @logger = logger
     end
 
     # A hash of gems and the repositories they are used in:
@@ -53,6 +54,7 @@ module GemMiner
     # values.
     def parse_gemfiles
       results = search("filename:Gemfile #{@github_search_query}")
+
       log "Parsing #{results.count} gemfiles"
       gemfiles = results.reduce({}) do |memo, result|
         # We might have more than one Gemfile in a repository...
@@ -114,10 +116,6 @@ module GemMiner
 
         memo
       end
-    end
-
-    def log(s)
-      @logger.print s if @logger
     end
   end
 end
