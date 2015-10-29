@@ -40,10 +40,10 @@ module GemMiner
     # Output the result of a command to either the terminal or a file,
     # depending on the options given.
     def output(result)
-      unless options[:output]
-        puts result
-      else
+      if options[:output]
         File.write(options[:output], result)
+      else
+        puts result
       end
 
       result
