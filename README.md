@@ -1,5 +1,9 @@
 # GemMiner
 
+[![Build Status](https://travis-ci.org/reevoo/gem-miner.svg?branch=master)](https://travis-ci.org/reevoo/gem-miner)
+
+
+
 At [Reevoo](http://reevoo.github.io), we want to get rid of some of our old repositories - they don't do anything and they're confusing new starters. However, we want to make sure that these repositories aren't used by others.
 
 GemMiner looks through all of the repositories of a GitHub user and shows where a gem is being used by extracting information from Gemfiles and Gemspecs.
