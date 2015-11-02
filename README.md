@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/reevoo/gem-miner.svg?branch=master)](https://travis-ci.org/reevoo/gem-miner)
 
+[![Code Climate](https://codeclimate.com/github/reevoo/gem-miner/badges/gpa.svg)](https://codeclimate.com/github/reevoo/gem-miner)
+
 
 
 At [Reevoo](http://reevoo.github.io), we want to get rid of some of our old repositories - they don't do anything and they're confusing new starters. However, we want to make sure that these repositories aren't used by others.
