@@ -1,7 +1,7 @@
 # GemMiner
 
+[![Gem Version](https://badge.fury.io/rb/gem-miner.svg)](https://badge.fury.io/rb/gem-miner)
 [![Build Status](https://travis-ci.org/reevoo/gem-miner.svg?branch=master)](https://travis-ci.org/reevoo/gem-miner)
-
 [![Code Climate](https://codeclimate.com/github/reevoo/gem-miner/badges/gpa.svg)](https://codeclimate.com/github/reevoo/gem-miner)
 
 
