@@ -8,6 +8,9 @@ module GemMiner
   class Miner
     include Logger
 
+    GEMFILE_REGEX = /gem[\s]+([^\n\;]+)/
+    GEMSPEC_REGEX = /dependency[\s]+([^\n\;]+)/
+
     def self.gems_for(*args)
       new(*args).gems
     end
@@ -37,8 +40,8 @@ module GemMiner
     #   ...
     # }
     def collect_gems!
-      gemfiles = parse_gemfiles
-      gemspecs = parse_gemspecs
+      gemfiles = parse_sources('Gemfile', GEMFILE_REGEX)
+      gemspecs = parse_sources('gemspec', GEMSPEC_REGEX)
 
       gems = merge_hashes(gemfiles, gemspecs)
 
@@ -50,45 +53,24 @@ module GemMiner
     end
 
     # Collects all of the gemfiles for all Reevoo repositories.
-    # Returns a dictionary with the gem as the key and an array of repositories as
-    # values.
-    def parse_gemfiles
-      results = search("filename:Gemfile #{@github_search_query}")
-
-      log "Parsing #{results.count} gemfiles"
-      gemfiles = results.reduce({}) do |memo, result|
-        # We might have more than one Gemfile in a repository...
+    # Returns a dictionary with the gem as the key and an array of repositories
+    # as values.
+    def parse_sources(filename, regex)
+      results = search("filename:#{filename} #{@github_search_query}")
+      log "Parsing #{results.count} #{filename}s"
+      files = results.reduce({}) do |memo, result|
+        # We might have more than one dep file in a repository...
         memo[name_of(result)] ||= []
-        memo[name_of(result)] += extract_gemfile(result[:content])
+        memo[name_of(result)] += extract_deps(result[:content], regex)
         log '.'
         memo
       end
       log "done!\n"
-      gemfiles
+      files
     end
 
-    GEM_REGEX = /gem[\s]+([^\n\;]+)/
-    def extract_gemfile(gemfile)
-      gemfile.gsub(/\"/, '\'').scan(GEM_REGEX).flatten
-    end
-
-    def parse_gemspecs
-      results = search("filename:gemspec #{@github_search_query}")
-      log "Parsing #{results.count} gemspecs"
-      gemspecs = results.reduce({}) do |memo, result|
-        # We might have more than one Gemfile in a repository...
-        memo[name_of(result)] ||= []
-        memo[name_of(result)] += extract_gemspec(result[:content])
-        log '.'
-        memo
-      end
-      log "done!\n"
-      gemspecs
-    end
-
-    GEMSPEC_REGEX = /dependency[\s]+([^\n\;]+)/
-    def extract_gemspec(gemspec)
-      gemspec.gsub(/\"/, '\'').scan(GEMSPEC_REGEX).flatten
+    def extract_deps(file, regex)
+      file.gsub(/\"/, '\'').scan(regex).flatten
     end
 
     def search(query)
@@ -101,7 +83,7 @@ module GemMiner
     # h2 = { b: [1, 3], c: [1, 2, 3] }
     # merge_hashes(h1, h2) # => { a: [1, 2, 3], b: [1, 2, 3, 4], c: [1, 2, 3] }
     #
-    # From http://stackoverflow.com/questions/11171834/merging-ruby-hash-with-array-of-values-into-another-hash-with-array-of-values
+    # From http://stackoverflow.com/questions/11171834
     def merge_hashes(hash1, hash2)
       hash1.merge(hash2) { |key, oldval, newval| (oldval | newval) }
     end
