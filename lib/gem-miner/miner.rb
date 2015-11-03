@@ -60,8 +60,8 @@ module GemMiner
       log "Parsing #{results.count} #{filename}s"
       files = results.reduce({}) do |memo, result|
         # We might have more than one dep file in a repository...
-        memo[name_of(result)] ||= []
-        memo[name_of(result)] += extract_deps(result[:content], regex)
+        memo[result[:name]] ||= []
+        memo[result[:name]] += extract_deps(result[:content], regex)
         log '.'
         memo
       end
