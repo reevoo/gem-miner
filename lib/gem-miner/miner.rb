@@ -11,8 +11,8 @@ module GemMiner
     GEMFILE_REGEX = /gem[\s]+([^\n\;]+)/
     GEMSPEC_REGEX = /dependency[\s]+([^\n\;]+)/
 
-    def self.gems_for(*args)
-      new(*args).gems
+    def self.gems_for(github_search_query, github_token)
+      new(github_search_query, GithubClient.new(github_token)).gems
     end
 
     def initialize(github_search_query, github_client = GithubClient.new)
