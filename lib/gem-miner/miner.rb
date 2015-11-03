@@ -11,8 +11,8 @@ module GemMiner
     GEMFILE_REGEX = /gem[\s]+([^\n\;]+)/
     GEMSPEC_REGEX = /dependency[\s]+([^\n\;]+)/
 
-    def self.gems_for(*args)
-      new(*args).gems
+    def self.gems_for(github_search_query, github_token)
+      new(github_search_query, GithubClient.new(github_token)).gems
     end
 
     def initialize(github_search_query, github_client = GithubClient.new)
@@ -60,8 +60,8 @@ module GemMiner
       log "Parsing #{results.count} #{filename}s"
       files = results.reduce({}) do |memo, result|
         # We might have more than one dep file in a repository...
-        memo[name_of(result)] ||= []
-        memo[name_of(result)] += extract_deps(result[:content], regex)
+        memo[result[:name]] ||= []
+        memo[result[:name]] += extract_deps(result[:content], regex)
         log '.'
         memo
       end
