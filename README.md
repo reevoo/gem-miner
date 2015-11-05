@@ -17,7 +17,7 @@ This tool is being actively developed; please feel free to contribute or fork fo
 This is a tool, so it makes sense to install it globally.
 
 ```bash
-gem install 'gem-miner'
+gem install gem-miner
 ```
 
 ## Usage

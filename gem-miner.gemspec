@@ -20,11 +20,14 @@ Gem::Specification.new do |spec|
 
   # GitHub API Client
   spec.add_dependency 'octokit', '~> 4'
+  
+  # Gem installation magic
+  spec.add_dependency 'bundler', '~> 1'
 
   # CLI helper. Not at v1 yet...
   spec.add_dependency 'thor'
 
-  spec.add_development_dependency 'bundler', '~> 1'
+  # Dev dependencies
   spec.add_development_dependency 'rake', '~> 10'
   spec.add_development_dependency 'rspec', '~> 3'
   spec.add_development_dependency 'pry-byebug'
