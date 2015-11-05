@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'bundler/setup'
 require 'gem-miner/cli'
 
 GemMiner::CLI.start(ARGV)
